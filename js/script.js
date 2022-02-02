@@ -86,4 +86,20 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     renderTimer(deadLine, timer);
+
+    const modalButtons = document.querySelectorAll("[data-modal]"),
+        modal = document.querySelector(".modal"),
+        closeButton = modal.querySelector(".modal__close");
+
+    modalButtons.forEach(modalButton => {
+        modalButton.addEventListener("click", event => {
+            modal.classList.add("show");
+            modal.classList.remove("hide");
+        });
+    });
+
+    closeButton.addEventListener("click", event => {
+        modal.classList.add("hide");
+        modal.classList.remove("show");
+    });
 });
