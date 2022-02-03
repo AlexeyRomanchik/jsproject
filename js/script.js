@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         render() {
             return (
-            `<div class="menu__item">
+                `<div class="menu__item">
                 <img src="${this.image.url}" alt="${this.image.alt}}">
                 <h3 class="menu__item-subtitle">${this.description.title}</h3>
                 <div class="menu__item-descr">${this.description.text}</div>
@@ -189,11 +189,10 @@ document.addEventListener("DOMContentLoaded", () => {
             let items = "";
             this.menuItems.forEach(menuItem => {
                 items += menuItem.render();
-                console.log(menuItem.render());
             });
 
             return (
-            `<div class="menu">
+                `<div class="menu">
                 <h2 class="title">${this.title}</h2>
                 <div class="menu__field">
                     <div class="container">
@@ -201,8 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         </div>
                     </div>
                 </div>
-            </div>
-            `);
+            </div>`);
         }
     }
 
@@ -231,9 +229,44 @@ document.addEventListener("DOMContentLoaded", () => {
         postMenuItem = new MenuItem(postDescription, postImg, postPrice);
 
     const menuItems = [veguMenuItem, eliteMenuItem, postMenuItem],
-    menu = new Menu("Наше меню на день", menuItems);
+        menu = new Menu("Наше меню на день", menuItems);
 
 
     const menuContainer = document.querySelector(".menu-container");
     menuContainer.innerHTML = menu.render();
+
+    const forms = document.querySelectorAll("form");
+
+    const postData = (form) => {
+        form.addEventListener("submit", event => {
+            event.preventDefault();
+
+            const request = new XMLHttpRequest(),
+                formData = new FormData(event.target),
+                data = {};
+
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            request.open("POST", "server.php");
+            request.setRequestHeader("Content-type", "application/json");
+            request.send(JSON.stringify(data));
+
+            request.addEventListener("load", event => {
+                if (request.status === 200) {
+                    console.log(request.response);
+                    form.reset();
+                }
+            });
+        });
+    };
+
+
+    forms.forEach(form => {
+        postData(form);
+    });
+
+
+
 });
