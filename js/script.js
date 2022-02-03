@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalTimerId = setTimeout((openModel), 5000);
 
     const showModalByScroll = () => {
-        if (window.pageYOffset + document.documentElement.clientHeight >= 
+        if (window.pageYOffset + document.documentElement.clientHeight >=
             document.documentElement.scrollHeight - 1) {
             openModel();
             window.removeEventListener("scroll", showModalByScroll);
@@ -134,4 +134,106 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.addEventListener("scroll", showModalByScroll);
 
+    class Image {
+        constructor(url, alt) {
+            this.url = url;
+            this.alt = alt;
+        }
+    }
+
+    class Price {
+        constructor(total, currency) {
+            this.total = total;
+            this.currency = currency;
+        }
+    }
+
+    class Description {
+        constructor(title, text) {
+            this.title = title;
+            this.text = text;
+        }
+    }
+
+    class MenuItem {
+        constructor(description, image, price) {
+            this.description = description;
+            this.image = image;
+            this.price = price;
+        }
+
+        render() {
+            return (
+            `<div class="menu__item">
+                <img src="${this.image.url}" alt="${this.image.alt}}">
+                <h3 class="menu__item-subtitle">${this.description.title}</h3>
+                <div class="menu__item-descr">${this.description.text}</div>
+                <div class="menu__item-divider"></div>
+                <div class="menu__item-price">
+                    <div class="menu__item-cost">Цена:</div>
+                    <div class="menu__item-total">
+                        <span>${this.price.total}</span> ${this.price.currency}
+                    </div>
+                </div>
+            </div>`);
+        }
+    }
+
+    class Menu {
+        constructor(title, menuItems) {
+            this.title = title;
+            this.menuItems = menuItems;
+        }
+
+        render() {
+            let items = "";
+            this.menuItems.forEach(menuItem => {
+                items += menuItem.render();
+                console.log(menuItem.render());
+            });
+
+            return (
+            `<div class="menu">
+                <h2 class="title">${this.title}</h2>
+                <div class="menu__field">
+                    <div class="container">
+                            ${items}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `);
+        }
+    }
+
+    const vegyImg = new Image("img/tabs/vegy.jpg", "vegy"),
+        eliteImg = new Image("img/tabs/elite.jpg", "elite"),
+        postImg = new Image("img/tabs/post.jpg", "post");
+
+    const vegyPrice = new Price(229, "$/день"),
+        elitePrice = new Price(550, "$/день"),
+        postPrice = new Price(430, "$/день");
+
+    const vegyDescription = new Description("Меню 'Фитнес'", `Меню "Фитнес" - 
+        это новый подход к приготовлению блюд: больше свежих овощей и фруктов. 
+        Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой
+        и высоким качеством!`),
+        eliteDescription = new Description("Меню 'Премиум'", `В меню “Премиум” мы используем
+        не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба,
+        морепродукты, фрукты - ресторанное меню без похода в ресторан!`),
+        postDescription = new Description('Меню "Постное"', `Меню “Постное” - это тщательный
+        подбор ингредиентов: полное отсутствие продуктов животного происхождения,
+        молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет 
+        тофу и импортных вегетарианских стейков.`);
+
+    const veguMenuItem = new MenuItem(vegyDescription, vegyImg, vegyPrice),
+        eliteMenuItem = new MenuItem(eliteDescription, eliteImg, elitePrice),
+        postMenuItem = new MenuItem(postDescription, postImg, postPrice);
+
+    const menuItems = [veguMenuItem, eliteMenuItem, postMenuItem],
+    menu = new Menu("Наше меню на день", menuItems);
+
+
+    const menuContainer = document.querySelector(".menu-container");
+    menuContainer.innerHTML = menu.render();
 });
