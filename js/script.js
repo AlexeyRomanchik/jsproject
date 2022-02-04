@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    const modalTimerId = setTimeout((openModel), 5000);
+    const modalTimerId = setTimeout((openModel), 500000);
 
     const showModalByScroll = () => {
         if (window.pageYOffset + document.documentElement.clientHeight >=
@@ -316,5 +316,62 @@ document.addEventListener("DOMContentLoaded", () => {
 
     forms.forEach(form => {
         bindData(form);
+    });
+
+    const slides = document.querySelectorAll(".offer__slide"),
+        prevButton = document.querySelector(".offer__slider-prev"),
+        nextButton = document.querySelector(".offer__slider-next"),
+        currentSlide = document.querySelector("#current"),
+        totalSlides = document.querySelector("#total"),
+        total = slides.length;
+
+    let current = 0;
+
+    const hideElement = (element) => {
+        element.classList.remove("show", "fade");
+        element.classList.add("hide");
+    };
+
+    const showElement = (element) => {
+        element.classList.remove("hide");
+        element.classList.add("show", "fade");
+    };
+
+    const createSlider = function () {
+        slides.forEach(slide => {
+            hideElement(slide);
+        });
+
+        currentSlide.textContent = addZero(current + 1);
+        totalSlides.textContent = addZero(total);
+
+        showElement(slides[current]);
+
+        prevButton.onmousedown = prevButton.onselectstart =
+            nextButton.onmousedown = prevButton.onselectstart = function () {
+                return false;
+            };
+    }();
+
+    prevButton.addEventListener("click", event => {
+        hideElement(slides[current]);
+
+        if (--current < 0) {
+            current = total - 1;
+        }
+
+        showElement(slides[current]);
+        currentSlide.textContent = addZero(current + 1);
+    });
+
+    nextButton.addEventListener("click", event => {
+        hideElement(slides[current]);
+
+        if (++current >= total) {
+            current = 0;
+        }
+
+        showElement(slides[current]);
+        currentSlide.textContent = addZero(current + 1);
     });
 });
