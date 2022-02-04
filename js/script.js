@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         render() {
             return (
-            `<div class="menu__item">
+                `<div class="menu__item">
                 <img src="${this.image.url}" alt="${this.image.alt}}">
                 <h3 class="menu__item-subtitle">${this.description.title}</h3>
                 <div class="menu__item-descr">${this.description.text}</div>
@@ -188,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             return (
-            `<div class="menu">
+                `<div class="menu">
                 <h2 class="title">${this.title}</h2>
                 <div class="menu__field">
                     <div class="container">
@@ -200,36 +200,41 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    const vegyImg = new Image("img/tabs/vegy.jpg", "vegy"),
-        eliteImg = new Image("img/tabs/elite.jpg", "elite"),
-        postImg = new Image("img/tabs/post.jpg", "post");
+    const getData = async (url) => {
+        const response = await fetch(url);
 
-    const vegyPrice = new Price(229, "$/день"),
-        elitePrice = new Price(550, "$/день"),
-        postPrice = new Price(430, "$/день");
+        if (!response.ok) {
+            throw new Error(`Could not get ${url}, status ${response.status}`);
+        }
 
-    const vegyDescription = new Description("Меню 'Фитнес'", `Меню "Фитнес" - 
-        это новый подход к приготовлению блюд: больше свежих овощей и фруктов. 
-        Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой
-        и высоким качеством!`),
-        eliteDescription = new Description("Меню 'Премиум'", `В меню “Премиум” мы используем
-        не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба,
-        морепродукты, фрукты - ресторанное меню без похода в ресторан!`),
-        postDescription = new Description('Меню "Постное"', `Меню “Постное” - это тщательный
-        подбор ингредиентов: полное отсутствие продуктов животного происхождения,
-        молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет 
-        тофу и импортных вегетарианских стейков.`);
+        return await response.json();
+    };
 
-    const veguMenuItem = new MenuItem(vegyDescription, vegyImg, vegyPrice),
-        eliteMenuItem = new MenuItem(eliteDescription, eliteImg, elitePrice),
-        postMenuItem = new MenuItem(postDescription, postImg, postPrice);
+    const createMenu = () => {
+        const menuItems = [],
+            items = getData("http://localhost:3000/menu").then(items => {
+                items.forEach(({
+                    img,
+                    altimg,
+                    title,
+                    descr,
+                    price
+                }) => {
+                    menuItems.push(new MenuItem(
+                        new Description(title, descr),
+                        new Image(img, altimg),
+                        new Price(price, "$/день")
+                    ));
+                });
 
-    const menuItems = [veguMenuItem, eliteMenuItem, postMenuItem],
-        menu = new Menu("Наше меню на день", menuItems);
+                const menuContainer = document.querySelector(".menu-container"),
+                    menu = new Menu("Наше меню на день", menuItems);
 
+                menuContainer.innerHTML = menu.render();
+            });
+    };
 
-    const menuContainer = document.querySelector(".menu-container");
-    menuContainer.innerHTML = menu.render();
+    createMenu();
 
     const message = {
         loading: "img/form/spinner.svg",
@@ -251,7 +256,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="modal__content">
             <div class="modal__close" data-close>&times;</div>
             <div class="modal__title">${message}</div>
-        </div>`;    
+        </div>`;
 
         prevModalDialog.parentElement.append(tanksModal);
 
@@ -263,13 +268,29 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 5000);
     };
 
-    const postData = (form) => {
+    const postData = async (url, data) => {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: data
+        });
+
+        if (!response.ok) {
+            throw new Error(`Could not get ${url}, status ${response.status}`);
+        }
+
+        return await response.json();
+    };
+
+    const bindData = (form) => {
         form.addEventListener("submit", event => {
             event.preventDefault();
 
             const formData = new FormData(event.target),
                 statusImage = document.createElement("img"),
-                json = {};
+                json = JSON.stringify(Object.fromEntries(formData.entries()));
 
             statusImage.src = message.loading;
             statusImage.style.cssText = `
@@ -278,30 +299,22 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
             form.after(statusImage);
 
-            formData.forEach((value, key) => {
-                json[key] = value;
-            });
-            
-            fetch("server.php", {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json"
-                },
-                body: JSON.stringify(json)
-            }).then(data => data.text())
-            .then(data => {
-                console.log(data);
-                showPostResultModal(message.sucsess);
-            }).catch(() => {
-                showPostResultModal(message.failure);
-            }).finally(() => {
-                form.reset();
-                statusImage.remove();
-            });
+            postData("http://localhost:3000/requests", json)
+                .then(data => {
+                    console.log(data);
+                    showPostResultModal(message.sucsess);
+                })
+                .catch(() => {
+                    showPostResultModal(message.failure);
+                })
+                .finally(() => {
+                    form.reset();
+                    statusImage.remove();
+                });
         });
     };
 
     forms.forEach(form => {
-        postData(form);
+        bindData(form);
     });
 });
