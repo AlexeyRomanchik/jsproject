@@ -107,7 +107,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     modal.addEventListener("click", event => {
-        console.dir(event.target);
         if (event.target === modal || event.target.getAttribute("data-close") === "") {
             closeModal();
         }
@@ -268,10 +267,9 @@ document.addEventListener("DOMContentLoaded", () => {
         form.addEventListener("submit", event => {
             event.preventDefault();
 
-            const request = new XMLHttpRequest(),
-                formData = new FormData(event.target),
+            const formData = new FormData(event.target),
                 statusImage = document.createElement("img"),
-                data = {};
+                json = {};
 
             statusImage.src = message.loading;
             statusImage.style.cssText = `
@@ -281,22 +279,24 @@ document.addEventListener("DOMContentLoaded", () => {
             form.after(statusImage);
 
             formData.forEach((value, key) => {
-                data[key] = value;
+                json[key] = value;
             });
-
-            request.open("POST", "server1.php");
-            request.setRequestHeader("Content-type", "application/json");
-            request.send(JSON.stringify(data));
-
-            request.addEventListener("load", event => {
+            
+            fetch("server.php", {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify(json)
+            }).then(data => data.text())
+            .then(data => {
+                console.log(data);
+                showPostResultModal(message.sucsess);
+            }).catch(() => {
+                showPostResultModal(message.failure);
+            }).finally(() => {
+                form.reset();
                 statusImage.remove();
-
-                if (request.status === 200) {
-                    form.reset();
-                    showPostResultModal(message.sucsess);
-                } else {
-                    showPostResultModal(message.failure);
-                }
             });
         });
     };
