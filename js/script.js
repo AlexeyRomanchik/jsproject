@@ -38,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
     hideTabs();
     showTab();
 
-
     const deadLine = '2022-02-15',
         timer = document.querySelector(".timer");
 
@@ -88,8 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderTimer(deadLine, timer);
 
     const modalButtons = document.querySelectorAll("[data-modal]"),
-        modal = document.querySelector(".modal"),
-        closeButton = modal.querySelector(".modal__close");
+        modal = document.querySelector(".modal");
 
     const openModel = () => {
         modal.classList.add("show");
@@ -108,10 +106,9 @@ document.addEventListener("DOMContentLoaded", () => {
         modalButton.addEventListener("click", openModel);
     });
 
-    closeButton.addEventListener("click", closeModal);
-
     modal.addEventListener("click", event => {
-        if (event.target === modal) {
+        console.dir(event.target);
+        if (event.target === modal || event.target.getAttribute("data-close") === "") {
             closeModal();
         }
     });
@@ -164,7 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         render() {
             return (
-                `<div class="menu__item">
+            `<div class="menu__item">
                 <img src="${this.image.url}" alt="${this.image.alt}}">
                 <h3 class="menu__item-subtitle">${this.description.title}</h3>
                 <div class="menu__item-descr">${this.description.text}</div>
@@ -192,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             return (
-                `<div class="menu">
+            `<div class="menu">
                 <h2 class="title">${this.title}</h2>
                 <div class="menu__field">
                     <div class="container">
@@ -235,7 +232,37 @@ document.addEventListener("DOMContentLoaded", () => {
     const menuContainer = document.querySelector(".menu-container");
     menuContainer.innerHTML = menu.render();
 
+    const message = {
+        loading: "img/form/spinner.svg",
+        sucsess: "Спасибо! Наши специалисты свяжутся с вами в ближайшее время.",
+        failure: "Что-то произошло не так..."
+    };
+
     const forms = document.querySelectorAll("form");
+
+    const showPostResultModal = (message) => {
+        const prevModalDialog = modal.querySelector(".modal__dialog");
+
+        prevModalDialog.classList.add("hide");
+        openModel();
+
+        const tanksModal = document.createElement("div");
+        tanksModal.classList.add("modal__dialog");
+        tanksModal.innerHTML = `
+        <div class="modal__content">
+            <div class="modal__close" data-close>&times;</div>
+            <div class="modal__title">${message}</div>
+        </div>`;    
+
+        prevModalDialog.parentElement.append(tanksModal);
+
+        setTimeout(() => {
+            tanksModal.remove();
+            prevModalDialog.classList.remove("hide");
+            prevModalDialog.classList.add("show");
+            closeModal();
+        }, 5000);
+    };
 
     const postData = (form) => {
         form.addEventListener("submit", event => {
@@ -243,30 +270,38 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const request = new XMLHttpRequest(),
                 formData = new FormData(event.target),
+                statusImage = document.createElement("img"),
                 data = {};
+
+            statusImage.src = message.loading;
+            statusImage.style.cssText = `
+                display: block;
+                margin: 0px auto;
+            `;
+            form.after(statusImage);
 
             formData.forEach((value, key) => {
                 data[key] = value;
             });
 
-            request.open("POST", "server.php");
+            request.open("POST", "server1.php");
             request.setRequestHeader("Content-type", "application/json");
             request.send(JSON.stringify(data));
 
             request.addEventListener("load", event => {
+                statusImage.remove();
+
                 if (request.status === 200) {
-                    console.log(request.response);
                     form.reset();
+                    showPostResultModal(message.sucsess);
+                } else {
+                    showPostResultModal(message.failure);
                 }
             });
         });
     };
 
-
     forms.forEach(form => {
         postData(form);
     });
-
-
-
 });
