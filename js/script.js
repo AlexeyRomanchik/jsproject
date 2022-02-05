@@ -378,11 +378,11 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     nextButton.addEventListener("click", event => {
-        if (offset == +width.slice(0, width.length - 2) * (total - 1)) {
+        if (offset == +width.replace(/\D/g, "") * (total - 1)) {
             offset = 0;
             current = 0;
         } else {
-            offset += +width.slice(0, width.length - 2);
+            offset += +width.replace(/\D/g, "");
             current++;
         }
 
@@ -391,10 +391,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     prevButton.addEventListener("click", event => {
         if (offset == 0) {
-            offset = +width.slice(0, width.length - 2) * (total - 1);
+            offset = +width.replace(/\D/g, "") * (total - 1);
             current = total - 1;
         } else {
-            offset -= +width.slice(0, width.length - 2);
+            offset -= +width.replace(/\D/g, "");
             current--;
         }
 
@@ -406,11 +406,76 @@ document.addEventListener("DOMContentLoaded", () => {
             const slideTo = event.target.getAttribute("data-slide-to");
 
             current = +slideTo;
-            offset = +width.slice(0, width.length - 2) * (slideTo);
+            offset = +width.replace(/\D/g, "") * (slideTo);
 
             sliderInner.style.transform = `translateX(-${offset}px)`;
             changeSliderIndicator();
         });
     });
+
+    const result = document.querySelector(".calculating span");
+    let sex = "female", height, weight, age, actCoff = 1.375;
+
+    const calсCalories = () => {
+        if (sex && height && weight && age && actCoff) {
+            if (sex === "male") {
+                result.textContent = Math.round(
+                    (88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * actCoff);
+            } else {
+                result.textContent = Math.round(
+                    (447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * actCoff);
+            }
+        } else {
+            result.textContent = "____";
+        }
+    };
+
+    const getStaticInformation = (selector, activeClass) => {
+        const elements = document.querySelectorAll(`${selector} div`);
+
+        elements.forEach(element => {
+            element.addEventListener("click", event => {
+                if (event.target.getAttribute("data-act-coff")) {
+                    actCoff = +event.target.getAttribute("data-act-coff");
+                } else {
+                    sex = event.target.getAttribute("id");
+                }
+
+                elements.forEach(element => element.classList.remove(activeClass));
+                element.classList.add(activeClass);
+
+                calсCalories();
+            });
+        });
+    };
+
+    const getInputInformation = (selector) => {
+        const input = document.querySelector(selector);
+
+        input.addEventListener("input", event => {
+            switch (input.getAttribute("id")) {
+                case "height":
+                    height = +input.value;
+                    break;
+                case "weight":
+                    weight = +input.value;
+                    break;
+                case "age":
+                    age = +input.value;
+                    break;
+            }
+
+            calсCalories();
+        });
+    };
+
+    getStaticInformation("#gender", "calculating__choose-item_active");
+    getStaticInformation(".calculating__choose_big", "calculating__choose-item_active");
+
+    getInputInformation("#height");
+    getInputInformation("#weight");
+    getInputInformation("#age");
+
+    calсCalories();
 
 });
