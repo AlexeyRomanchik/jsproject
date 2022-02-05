@@ -318,60 +318,58 @@ document.addEventListener("DOMContentLoaded", () => {
         bindData(form);
     });
 
-    const slides = document.querySelectorAll(".offer__slide"),
+    const sliderWrapper = document.querySelector(".offer__slider-wrapper"),
+        sliderInner = sliderWrapper.querySelector(".offer_slider-inner"),
+        slides = sliderInner.querySelectorAll(".offer__slide"),
         prevButton = document.querySelector(".offer__slider-prev"),
         nextButton = document.querySelector(".offer__slider-next"),
         currentSlide = document.querySelector("#current"),
         totalSlides = document.querySelector("#total"),
+        width = window.getComputedStyle(sliderWrapper).width,
         total = slides.length;
 
-    let current = 0;
-
-    const hideElement = (element) => {
-        element.classList.remove("show", "fade");
-        element.classList.add("hide");
-    };
-
-    const showElement = (element) => {
-        element.classList.remove("hide");
-        element.classList.add("show", "fade");
-    };
+    let current = 0,
+        offset = 0;
 
     const createSlider = function () {
-        slides.forEach(slide => {
-            hideElement(slide);
-        });
+        slides.forEach(slider => slider.style.width = width);
+        sliderInner.style.width = 100 * total + "%";
+        sliderInner.style.display = "flex";
+        sliderInner.style.transition = "0.5s all";
+        sliderWrapper.style.overflow = "hidden";
 
-        currentSlide.textContent = addZero(current + 1);
         totalSlides.textContent = addZero(total);
-
-        showElement(slides[current]);
+        currentSlide.textContent = addZero(current + 1);
 
         prevButton.onmousedown = prevButton.onselectstart =
-            nextButton.onmousedown = prevButton.onselectstart = function () {
-                return false;
-            };
+             nextButton.onmousedown = prevButton.onselectstart = function () {
+                 return false;
+             };
     }();
 
-    prevButton.addEventListener("click", event => {
-        hideElement(slides[current]);
-
-        if (--current < 0) {
-            current = total - 1;
+    nextButton.addEventListener("click", event => {
+        if (offset == +width.slice(0, width.length - 2) * (total - 1)) {
+            offset = 0;
+            current = 0;
+        } else {
+            offset += +width.slice(0, width.length - 2);
+            current++;
         }
 
-        showElement(slides[current]);
+        sliderInner.style.transform = `translateX(-${offset}px)`;
         currentSlide.textContent = addZero(current + 1);
     });
 
-    nextButton.addEventListener("click", event => {
-        hideElement(slides[current]);
-
-        if (++current >= total) {
-            current = 0;
+    prevButton.addEventListener("click", event => {
+        if (offset == 0) {
+            offset = +width.slice(0, width.length - 2) * (total - 1);
+            current = total - 1; 
+        } else {
+            offset -= +width.slice(0, width.length - 2);
+            current--;
         }
 
-        showElement(slides[current]);
+        sliderInner.style.transform = `translateX(-${offset}px)`;
         currentSlide.textContent = addZero(current + 1);
     });
 });
