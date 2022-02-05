@@ -318,21 +318,43 @@ document.addEventListener("DOMContentLoaded", () => {
         bindData(form);
     });
 
-    const sliderWrapper = document.querySelector(".offer__slider-wrapper"),
+    const slider = document.querySelector(".offer__slider"),
+        sliderWrapper = slider.querySelector(".offer__slider-wrapper"),
         sliderInner = sliderWrapper.querySelector(".offer_slider-inner"),
         slides = sliderInner.querySelectorAll(".offer__slide"),
-        prevButton = document.querySelector(".offer__slider-prev"),
-        nextButton = document.querySelector(".offer__slider-next"),
-        currentSlide = document.querySelector("#current"),
-        totalSlides = document.querySelector("#total"),
+        prevButton = slider.querySelector(".offer__slider-prev"),
+        nextButton = slider.querySelector(".offer__slider-next"),
+        currentSlide = slider.querySelector("#current"),
+        totalSlides = slider.querySelector("#total"),
         width = window.getComputedStyle(sliderWrapper).width,
-        total = slides.length;
+        total = slides.length,
+        dots = [];
 
     let current = 0,
         offset = 0;
 
     const createSlider = function () {
         slides.forEach(slider => slider.style.width = width);
+
+        slider.style.position = "relative";
+
+        const indicators = document.createElement("ol");
+        indicators.classList.add("carousel-indicators");
+        slider.append(indicators);
+
+        for (let i = 0; i < total; i++) {
+            const dot = document.createElement("li");
+            dot.setAttribute("data-slide-to", i);
+            dot.classList.add("dot");
+
+            if (i == 0) {
+                dot.style.opacity = 1;
+            }
+
+            indicators.append(dot);
+            dots.push(dot);
+        }
+
         sliderInner.style.width = 100 * total + "%";
         sliderInner.style.display = "flex";
         sliderInner.style.transition = "0.5s all";
@@ -342,10 +364,18 @@ document.addEventListener("DOMContentLoaded", () => {
         currentSlide.textContent = addZero(current + 1);
 
         prevButton.onmousedown = prevButton.onselectstart =
-             nextButton.onmousedown = prevButton.onselectstart = function () {
-                 return false;
-             };
+            nextButton.onmousedown = prevButton.onselectstart = function () {
+                return false;
+            };
     }();
+
+    const changeSliderIndicator = () => {
+        sliderInner.style.transform = `translateX(-${offset}px)`;
+        currentSlide.textContent = addZero(current + 1);
+
+        dots.forEach(dot => dot.style.opacity = 0.5);
+        dots[current].style.opacity = 1;
+    };
 
     nextButton.addEventListener("click", event => {
         if (offset == +width.slice(0, width.length - 2) * (total - 1)) {
@@ -356,20 +386,31 @@ document.addEventListener("DOMContentLoaded", () => {
             current++;
         }
 
-        sliderInner.style.transform = `translateX(-${offset}px)`;
-        currentSlide.textContent = addZero(current + 1);
+        changeSliderIndicator();
     });
 
     prevButton.addEventListener("click", event => {
         if (offset == 0) {
             offset = +width.slice(0, width.length - 2) * (total - 1);
-            current = total - 1; 
+            current = total - 1;
         } else {
             offset -= +width.slice(0, width.length - 2);
             current--;
         }
 
-        sliderInner.style.transform = `translateX(-${offset}px)`;
-        currentSlide.textContent = addZero(current + 1);
+        changeSliderIndicator();
     });
+
+    dots.forEach(dot => {
+        dot.addEventListener("click", event => {
+            const slideTo = event.target.getAttribute("data-slide-to");
+
+            current = +slideTo;
+            offset = +width.slice(0, width.length - 2) * (slideTo);
+
+            sliderInner.style.transform = `translateX(-${offset}px)`;
+            changeSliderIndicator();
+        });
+    });
+
 });
