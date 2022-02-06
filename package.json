@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/AlexeyRomanchik/jsproject#readme",
   "devDependencies": {
-    "json-server": "^0.17.0"
+    "copy-webpack-plugin": "^10.2.4",
+    "json-server": "^0.17.0",
+    "webpack": "^5.68.0",
+    "webpack-cli": "^4.9.2"
   }
 }
