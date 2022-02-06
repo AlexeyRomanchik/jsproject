@@ -214,27 +214,28 @@ function cards() {
     }
 
     const createMenu = () => {
-        const menuItems = [],
-            items = (0,_services_getData__WEBPACK_IMPORTED_MODULE_0__["default"])("http://localhost:3000/menu").then(items => {
-                items.forEach(({
-                    img,
-                    altimg,
-                    title,
-                    descr,
-                    price
-                }) => {
-                    menuItems.push(new MenuItem(
-                        new Description(title, descr),
-                        new Image(img, altimg),
-                        new Price(price, "$/день")
-                    ));
-                });
-
-                const menuContainer = document.querySelector(".menu-container"),
-                    menu = new Menu("Наше меню на день", menuItems);
-
-                menuContainer.innerHTML = menu.render();
+        const menuItems = [];
+        
+        (0,_services_getData__WEBPACK_IMPORTED_MODULE_0__["default"])("http://localhost:3000/menu").then(items => {
+            items.forEach(({
+                img,
+                altimg,
+                title,
+                descr,
+                price
+            }) => {
+                menuItems.push(new MenuItem(
+                    new Description(title, descr),
+                    new Image(img, altimg),
+                    new Price(price, "$/день")
+                ));
             });
+
+            const menuContainer = document.querySelector(".menu-container"),
+                menu = new Menu("Наше меню на день", menuItems);
+
+            menuContainer.innerHTML = menu.render();
+        });
     };
 
     createMenu();
@@ -259,14 +260,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function forms(modalSelector) {
+function forms(formSelector, modalSelector) {
     const message = {
         loading: "img/form/spinner.svg",
         sucsess: "Спасибо! Наши специалисты свяжутся с вами в ближайшее время.",
         failure: "Что-то произошло не так..."
     };
 
-    const forms = document.querySelectorAll("form");
+    const forms = document.querySelectorAll(formSelector);
 
     const showPostResultModal = (message) => {
         const prevModalDialog = document.querySelector(".modal__dialog");
@@ -411,15 +412,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _services_addZero__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/addZero */ "./src/js/services/addZero.js");
 
 
-function slider() {
-    const slider = document.querySelector(".offer__slider"),
-        sliderWrapper = slider.querySelector(".offer__slider-wrapper"),
-        sliderInner = sliderWrapper.querySelector(".offer_slider-inner"),
-        slides = sliderInner.querySelectorAll(".offer__slide"),
-        prevButton = slider.querySelector(".offer__slider-prev"),
-        nextButton = slider.querySelector(".offer__slider-next"),
-        currentSlide = slider.querySelector("#current"),
-        totalSlides = slider.querySelector("#total"),
+function slider({
+    sliderSelector,
+    sliderWrapperSelector,
+    sliderInnerSelector,
+    slidesSelector,
+    prevButtonSelector,
+    nextButtonSelector,
+    currentSlideSelector,
+    totalSlidesSelector,
+}) {
+    const slider = document.querySelector(sliderSelector),
+        sliderWrapper = slider.querySelector(sliderWrapperSelector),
+        sliderInner = sliderWrapper.querySelector(sliderInnerSelector),
+        slides = sliderInner.querySelectorAll(slidesSelector),
+        prevButton = slider.querySelector(prevButtonSelector),
+        nextButton = slider.querySelector(nextButtonSelector),
+        currentSlide = slider.querySelector(currentSlideSelector),
+        totalSlides = slider.querySelector(totalSlidesSelector),
         width = window.getComputedStyle(sliderWrapper).width,
         total = slides.length,
         dots = [];
@@ -522,15 +532,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-function tabs() {
-    const tabs = document.querySelectorAll(".tabcontent"),
-        tabHeaderItemsParent = document.querySelector(".tabheader__items"),
-        tabHeaderItems = tabHeaderItemsParent.querySelectorAll(".tabheader__item");
+function tabs(tabContentSelector, tabMenuSelector, tabMenuHeader, activeClass) {
+    const tabs = document.querySelectorAll(tabContentSelector),
+        tabHeaderItemsParent = document.querySelector(tabMenuSelector),
+        tabHeaderItems = tabHeaderItemsParent.querySelectorAll(tabMenuHeader);
 
     tabHeaderItemsParent.addEventListener("click", event => {
         const target = event.target;
 
-        if (target && target.classList.contains("tabheader__item")) {
+        if (target && target.classList.contains(tabMenuHeader.slice(1))) {
             tabHeaderItems.forEach((item, i) => {
                 if (item == target) {
                     hideTabs();
@@ -547,14 +557,14 @@ function tabs() {
         });
 
         tabHeaderItems.forEach(item => {
-            item.classList.remove("tabheader__item_active");
+            item.classList.remove(activeClass);
         });
     };
 
     const showTab = (i = 0) => {
         tabs[i].classList.remove("hide");
         tabs[i].classList.add("show", "fade");
-        tabHeaderItems[i].classList.add("tabheader__item_active");
+        tabHeaderItems[i].classList.add(activeClass);
     };
 
     hideTabs();
@@ -575,9 +585,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-function timer() {
-    const deadLine = '2022-02-15',
-        timer = document.querySelector(".timer");
+/* harmony import */ var _services_addZero__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../services/addZero */ "./src/js/services/addZero.js");
+
+
+function timer(deadLine, timerSelector) {
+    const timer = document.querySelector(timerSelector);
 
     const getInterval = (endTime) => {
         const total = Date.parse(endTime) - Date.now(),
@@ -595,10 +607,6 @@ function timer() {
         };
     };
 
-    const addZero = (num) => {
-        return (num >= 0 && num < 10) ? `0${num}` : num;
-    };
-
     const renderTimer = (endTime, timerElement) => {
         const days = timerElement.querySelector("#days"),
             hours = timerElement.querySelector("#hours"),
@@ -611,10 +619,10 @@ function timer() {
         function changeTimer() {
             const interval = getInterval(endTime);
 
-            days.textContent = addZero(interval.days);
-            hours.textContent = addZero(interval.hours);
-            minutes.textContent = addZero(interval.minutes);
-            seconds.textContent = addZero(interval.seconds);
+            days.textContent = (0,_services_addZero__WEBPACK_IMPORTED_MODULE_0__["default"])(interval.days);
+            hours.textContent = (0,_services_addZero__WEBPACK_IMPORTED_MODULE_0__["default"])(interval.hours);
+            minutes.textContent = (0,_services_addZero__WEBPACK_IMPORTED_MODULE_0__["default"])(interval.minutes);
+            seconds.textContent = (0,_services_addZero__WEBPACK_IMPORTED_MODULE_0__["default"])(interval.seconds);
 
             if (interval.total <= 0) {
                 clearInterval(intervalId);
@@ -783,14 +791,23 @@ __webpack_require__.r(__webpack_exports__);
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    const modalTimerId = setTimeout(() =>(0,_modules_modal__WEBPACK_IMPORTED_MODULE_3__["default"])(".modal"), 500000);
+    const modalTimerId = setTimeout(() => (0,_modules_modal__WEBPACK_IMPORTED_MODULE_3__["default"])(".modal"), 500000);
 
-    (0,_modules_tabs__WEBPACK_IMPORTED_MODULE_0__["default"])();
-    (0,_modules_timer__WEBPACK_IMPORTED_MODULE_1__["default"])();
+    (0,_modules_tabs__WEBPACK_IMPORTED_MODULE_0__["default"])(".tabcontent", ".tabheader__items", ".tabheader__item", "tabheader__item_active");
+    (0,_modules_timer__WEBPACK_IMPORTED_MODULE_1__["default"])("2022-02-15", ".timer");
     (0,_modules_cards__WEBPACK_IMPORTED_MODULE_2__["default"])();
     (0,_modules_modal__WEBPACK_IMPORTED_MODULE_3__["default"])(".modal", modalTimerId);
-    (0,_modules_forms__WEBPACK_IMPORTED_MODULE_4__["default"])(".modal");
-    (0,_modules_slider__WEBPACK_IMPORTED_MODULE_5__["default"])();
+    (0,_modules_forms__WEBPACK_IMPORTED_MODULE_4__["default"])(".form", ".modal");
+    (0,_modules_slider__WEBPACK_IMPORTED_MODULE_5__["default"])({
+        sliderSelector: ".offer__slider",
+        sliderWrapperSelector: ".offer__slider-wrapper",
+        sliderInnerSelector: ".offer_slider-inner",
+        slidesSelector: ".offer__slide",
+        prevButtonSelector: ".offer__slider-prev",
+        nextButtonSelector: ".offer__slider-next",
+        currentSlideSelector: "#current",
+        totalSlidesSelector: "#total"
+    });
     (0,_modules_calc__WEBPACK_IMPORTED_MODULE_6__["default"])();
 });
 })();

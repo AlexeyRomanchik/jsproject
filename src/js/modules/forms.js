@@ -1,14 +1,14 @@
 import postData from "../services/postData";
 import {openModel, closeModal} from "./modal";
 
-function forms(modalSelector) {
+function forms(formSelector, modalSelector) {
     const message = {
         loading: "img/form/spinner.svg",
         sucsess: "Спасибо! Наши специалисты свяжутся с вами в ближайшее время.",
         failure: "Что-то произошло не так..."
     };
 
-    const forms = document.querySelectorAll("form");
+    const forms = document.querySelectorAll(formSelector);
 
     const showPostResultModal = (message) => {
         const prevModalDialog = document.querySelector(".modal__dialog");

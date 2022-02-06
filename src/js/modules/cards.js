@@ -72,27 +72,28 @@ function cards() {
     }
 
     const createMenu = () => {
-        const menuItems = [],
-            items = getData("http://localhost:3000/menu").then(items => {
-                items.forEach(({
-                    img,
-                    altimg,
-                    title,
-                    descr,
-                    price
-                }) => {
-                    menuItems.push(new MenuItem(
-                        new Description(title, descr),
-                        new Image(img, altimg),
-                        new Price(price, "$/день")
-                    ));
-                });
-
-                const menuContainer = document.querySelector(".menu-container"),
-                    menu = new Menu("Наше меню на день", menuItems);
-
-                menuContainer.innerHTML = menu.render();
+        const menuItems = [];
+        
+        getData("http://localhost:3000/menu").then(items => {
+            items.forEach(({
+                img,
+                altimg,
+                title,
+                descr,
+                price
+            }) => {
+                menuItems.push(new MenuItem(
+                    new Description(title, descr),
+                    new Image(img, altimg),
+                    new Price(price, "$/день")
+                ));
             });
+
+            const menuContainer = document.querySelector(".menu-container"),
+                menu = new Menu("Наше меню на день", menuItems);
+
+            menuContainer.innerHTML = menu.render();
+        });
     };
 
     createMenu();

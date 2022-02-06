@@ -1,14 +1,23 @@
 import addZero from "../services/addZero";
 
-function slider() {
-    const slider = document.querySelector(".offer__slider"),
-        sliderWrapper = slider.querySelector(".offer__slider-wrapper"),
-        sliderInner = sliderWrapper.querySelector(".offer_slider-inner"),
-        slides = sliderInner.querySelectorAll(".offer__slide"),
-        prevButton = slider.querySelector(".offer__slider-prev"),
-        nextButton = slider.querySelector(".offer__slider-next"),
-        currentSlide = slider.querySelector("#current"),
-        totalSlides = slider.querySelector("#total"),
+function slider({
+    sliderSelector,
+    sliderWrapperSelector,
+    sliderInnerSelector,
+    slidesSelector,
+    prevButtonSelector,
+    nextButtonSelector,
+    currentSlideSelector,
+    totalSlidesSelector,
+}) {
+    const slider = document.querySelector(sliderSelector),
+        sliderWrapper = slider.querySelector(sliderWrapperSelector),
+        sliderInner = sliderWrapper.querySelector(sliderInnerSelector),
+        slides = sliderInner.querySelectorAll(slidesSelector),
+        prevButton = slider.querySelector(prevButtonSelector),
+        nextButton = slider.querySelector(nextButtonSelector),
+        currentSlide = slider.querySelector(currentSlideSelector),
+        totalSlides = slider.querySelector(totalSlidesSelector),
         width = window.getComputedStyle(sliderWrapper).width,
         total = slides.length,
         dots = [];

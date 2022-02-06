@@ -1,6 +1,7 @@
-function timer() {
-    const deadLine = '2022-02-15',
-        timer = document.querySelector(".timer");
+import addZero from "../services/addZero";
+
+function timer(deadLine, timerSelector) {
+    const timer = document.querySelector(timerSelector);
 
     const getInterval = (endTime) => {
         const total = Date.parse(endTime) - Date.now(),
@@ -16,10 +17,6 @@ function timer() {
             minutes,
             seconds
         };
-    };
-
-    const addZero = (num) => {
-        return (num >= 0 && num < 10) ? `0${num}` : num;
     };
 
     const renderTimer = (endTime, timerElement) => {
