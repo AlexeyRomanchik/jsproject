@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     timer("2022-02-15", ".timer");
     cards();
     modal(".modal", modalTimerId);
-    forms(".form", ".modal");
+    forms("form", ".modal");
     slider({
         sliderSelector: ".offer__slider",
         sliderWrapperSelector: ".offer__slider-wrapper",
